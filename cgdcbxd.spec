@@ -1,6 +1,6 @@
 Name:		cgdcbxd
 Version:	1.0.2
-Release:	5%{?dist}
+Release:	7%{?dist}
 Summary:	DCB network priority management daemon	
 Group:		System Environment/Base
 License:	GPLv2
@@ -32,6 +32,8 @@ host using the net_prio cgroup
 
 %build
 ./bootstrap.sh
+export CFLAGS="-DFORTIFY_SOURCE -fPIE -Wl,-z,relro,-z,now"
+export LDFLAGS=-pie
 %{configure}
 make
 
@@ -64,6 +66,12 @@ fi
 
 
 %changelog
+* Wed Feb 17 2016 Neil Horman <nhorman@redhat.com> - 1.0.2-7
+- Add fortify source to build (bz 1092524)
+
+* Wed Feb 17 2016 Neil Horman <nhorman@redhat.com> - 1.0.2-6
+- Enable RELRO and PIE in build (bz 1092524)
+
 * Tue Mar 04 2014 Neil Horman <nhorman@redhat.com> - 1.0.2-5
 - Fixed double usr/sbin in cgrulesengd path (bz1065694)
 
