@@ -1,6 +1,6 @@
 Name:		cgdcbxd
 Version:	1.0.2
-Release:	1%{?dist}
+Release:	5%{?dist}
 Summary:	DCB network priority management daemon	
 Group:		System Environment/Base
 License:	GPLv2
@@ -16,6 +16,7 @@ Source0:	%{name}-%{version}.tar.gz
 # upstream shortly
 Source1:	%{name}.service
 BuildRequires:	libcgroup-devel libmnl-devel libtool systemd-units
+Requires(pre):  %{_sbindir}/cgrulesengd
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
@@ -54,7 +55,27 @@ install -D -p -m 0644 %{SOURCE1} $RPM_BUILD_ROOT%{_unitdir}/cgdcbxd.service
 %postun
 %systemd_postun_with_restart cgdcbxd.service
 
+%triggerin -- iscsi-initiator-utils
+grep -q iscsid /etc/cgrules.conf
+if [ $? -ne 0 ]
+then
+	echo "*:iscsid net_prio cgdcb-4-3260" >> /etc/cgrules.conf
+fi
+
+
 %changelog
+* Tue Mar 04 2014 Neil Horman <nhorman@redhat.com> - 1.0.2-5
+- Fixed double usr/sbin in cgrulesengd path (bz1065694)
+
+* Mon Mar 03 2014 Neil Horman <nhorman@redhat.com> - 1.0.2-4
+- Added proper dependencies and cgrules trigger (bz1065694)
+
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 1.0.2-3
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 1.0.2-2
+- Mass rebuild 2013-12-27
+
 * Tue Jul 23 2013 Neil Horman <nhorman@redhat.com> - 1.0.2-1
 - Update to latest upstream
 
